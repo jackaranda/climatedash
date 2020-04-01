@@ -83,7 +83,7 @@ timeseries_plot = {
 	 dash.dependencies.Input('delta', 'value')])
 def update_timeseries_plot(select, compare, scale, delta):
 
-	plot = copy.copy(timeseries_plot)
+	plot = copy.deepcopy(timeseries_plot)
 
 	if delta == 'cumulative':
 		plot['data'][0]['x'] = cases[select].index
