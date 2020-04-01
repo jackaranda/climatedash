@@ -110,6 +110,12 @@ ENV/
 env.bak/
 venv.bak/
 
+# virtualenv paths
+bin/
+etc/
+include/
+share/
+
 # Spyder project settings
 .spyderproject
 .spyproject
