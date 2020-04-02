@@ -11,9 +11,9 @@ import dash_html_components as html
 
 query = 'South Africa'
 
-cases = pd.read_json('../data/covid-19/cases.json')
-deaths = pd.read_json('../data/covid-19/deaths.json')
-recovered = pd.read_json('../data/covid-19/recovered.json')
+cases = pd.read_json('../data/covid-19/cases.json').iloc[20:]
+deaths = pd.read_json('../data/covid-19/deaths.json').iloc[20:]
+recovered = pd.read_json('../data/covid-19/recovered.json').iloc[20:]
 
 with open('../data/mapping/ne_50m_admin_0_countries.json') as src:
 	mapdata = json.loads(src.read())
