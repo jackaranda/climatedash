@@ -69,7 +69,7 @@ timeseries_plot = {
 		{'type':'bar', 'marker':{'color':'rgb(64,256,64)'}, 'name':'recovered'}
 	],
 	'layout':{
-		'barmode':'stack',
+		'barmode':'relative',
 		'yaxis':{'type':'log'}
 	}
 }
@@ -86,24 +86,27 @@ def update_timeseries_plot(select, compare, scale, delta):
 	plot = copy.deepcopy(timeseries_plot)
 
 	if delta == 'cumulative':
+
+		plot['data'][2]['x'] = recovered[select].index
+		plot['data'][2]['y'] = -recovered[select]
+
 		plot['data'][0]['x'] = positives[select].index
 		plot['data'][0]['y'] = positives[select]
 
 		plot['data'][1]['x'] = deaths[select].index
 		plot['data'][1]['y'] = deaths[select]
 
-		plot['data'][2]['x'] = recovered[select].index
-		plot['data'][2]['y'] = recovered[select]
 
 	else:
+		plot['data'][2]['x'] = recovered[select].index[1:]
+		plot['data'][2]['y'] = -recovered[select].diff()
+
 		plot['data'][0]['x'] = positives[select].index[1:]
 		plot['data'][0]['y'] = positives[select].diff()
 
 		plot['data'][1]['x'] = deaths[select].index[1:]
 		plot['data'][1]['y'] = deaths[select].diff()
 
-		plot['data'][2]['x'] = recovered[select].index[1:]
-		plot['data'][2]['y'] = recovered[select].diff()
 
 
 	if scale != 'log':
