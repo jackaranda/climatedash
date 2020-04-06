@@ -11,7 +11,7 @@ import dash_html_components as html
 
 query = 'South Africa'
 
-cases = pd.read_json('../data/covid-19/cases.json').iloc[20:]
+positives = pd.read_json('../data/covid-19/cases.json').iloc[20:]
 deaths = pd.read_json('../data/covid-19/deaths.json').iloc[20:]
 recovered = pd.read_json('../data/covid-19/recovered.json').iloc[20:]
 
@@ -43,14 +43,14 @@ app.layout = html.Div([
 	    html.Div([
 		    dcc.Dropdown(
 		    	id='country-select',
-		    	options=[{'label':i, 'value':i} for i in cases.columns],
+		    	options=[{'label':i, 'value':i} for i in positives.columns],
 		    	value=query,
 		    	placeholder="Select a country",
 		    	style={"width":300}),
 		    html.H5(' compared with '),
 		    dcc.Dropdown(
 		    	id='country-compare',
-		    	options=[{'label':i, 'value':i} for i in cases.columns],
+		    	options=[{'label':i, 'value':i} for i in positives.columns],
 		    	placeholder="Select countries to compare",
 		    	multi=True,
 		    	value=[query],
@@ -64,7 +64,7 @@ app.layout = html.Div([
 
 timeseries_plot = {
 	'data':[
-		{'type':'bar', 'marker':{'color':'rgb(128,128,128)','alpha':0.7}, 'name':'cases'},
+		{'type':'bar', 'marker':{'color':'rgb(128,128,128)','alpha':0.7}, 'name':'positives'},
 		{'type':'bar', 'marker':{'color':'rgb(64,64,64)'}, 'name':'deaths'},
 		{'type':'bar', 'marker':{'color':'rgb(64,256,64)'}, 'name':'recovered'}
 	],
@@ -86,8 +86,8 @@ def update_timeseries_plot(select, compare, scale, delta):
 	plot = copy.deepcopy(timeseries_plot)
 
 	if delta == 'cumulative':
-		plot['data'][0]['x'] = cases[select].index
-		plot['data'][0]['y'] = cases[select]
+		plot['data'][0]['x'] = positives[select].index
+		plot['data'][0]['y'] = positives[select]
 
 		plot['data'][1]['x'] = deaths[select].index
 		plot['data'][1]['y'] = deaths[select]
@@ -96,8 +96,8 @@ def update_timeseries_plot(select, compare, scale, delta):
 		plot['data'][2]['y'] = recovered[select]
 
 	else:
-		plot['data'][0]['x'] = cases[select].index[1:]
-		plot['data'][0]['y'] = cases[select].diff()
+		plot['data'][0]['x'] = positives[select].index[1:]
+		plot['data'][0]['y'] = positives[select].diff()
 
 		plot['data'][1]['x'] = deaths[select].index[1:]
 		plot['data'][1]['y'] = deaths[select].diff()
@@ -112,7 +112,7 @@ def update_timeseries_plot(select, compare, scale, delta):
 	if len(compare):
 		for country in compare:
 			plot['data'].append(
-				{'x':cases[country].index, 'y':cases[country], 
+				{'x':positives[country].index, 'y':positives[country], 
 					'type':'line', 'marker':{'color':'rgb(256,128,128)', 'line-width':40}, 'name':country}
 				)
 
