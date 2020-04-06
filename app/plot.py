@@ -25,7 +25,8 @@ app.layout = html.Div([
 		html.H3(children='Covid-19 case dashboard'),
 
 #		dcc.Graph(id='map-plot', figure={}),
-
+		dcc.Location(id='location', refresh=True),
+	    
 	    dcc.Graph(id='timeseries-plot', figure={}),
    	    
    	    dcc.RadioItems(
@@ -77,13 +78,18 @@ timeseries_plot = {
 
 @app.callback(
 	dash.dependencies.Output('timeseries-plot', 'figure'),
-	[dash.dependencies.Input('country-select', 'value'),
+	[dash.dependencies.Input('location', 'hash'),
+	 dash.dependencies.Input('country-select', 'value'),
 	 dash.dependencies.Input('country-compare', 'value'),
 	 dash.dependencies.Input('log-scale', 'value'),
 	 dash.dependencies.Input('delta', 'value')])
-def update_timeseries_plot(select, compare, scale, delta):
+def update_timeseries_plot(hash_select, select, compare, scale, delta):
 
 	plot = copy.deepcopy(timeseries_plot)
+
+	if hash_select:
+		select = hash_select[1:]
+		
 
 	if delta == 'cumulative':
 
@@ -91,10 +97,10 @@ def update_timeseries_plot(select, compare, scale, delta):
 		plot['data'][2]['y'] = -recovered[select]
 
 		plot['data'][0]['x'] = positives[select].index
-		plot['data'][0]['y'] = positives[select]
+		plot['data'][0]['y'] = positives[select] - recovered[select] - deaths[select]
 
 		plot['data'][1]['x'] = deaths[select].index
-		plot['data'][1]['y'] = deaths[select]
+		plot['data'][1]['y'] = -deaths[select]
 
 
 	else:
@@ -105,7 +111,7 @@ def update_timeseries_plot(select, compare, scale, delta):
 		plot['data'][0]['y'] = positives[select].diff()
 
 		plot['data'][1]['x'] = deaths[select].index[1:]
-		plot['data'][1]['y'] = deaths[select].diff()
+		plot['data'][1]['y'] = -deaths[select].diff()
 
 
 
@@ -115,9 +121,11 @@ def update_timeseries_plot(select, compare, scale, delta):
 	if len(compare):
 		for country in compare:
 			plot['data'].append(
-				{'x':positives[country].index, 'y':positives[country], 
+				{'x':positives[country].index, 'y':positives[country] - recovered[country] - deaths[country], 
 					'type':'line', 'marker':{'color':'rgb(256,128,128)', 'line-width':40}, 'name':country}
 				)
+
+	plot['layout']['title'] = select
 
 	return plot
 
